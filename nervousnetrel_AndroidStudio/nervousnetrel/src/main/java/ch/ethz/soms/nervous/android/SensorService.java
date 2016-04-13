@@ -261,6 +261,7 @@ public class SensorService extends Service implements SensorEventListener, Noise
 					if (doCollect) {
 						sensorNotification.clearListeners();
 						sensorNotification.addListener(sensorListenerClass);
+						sensorNotification.start();
 					}
 					sensorCollectStatus = scNotification;
 				}
@@ -464,6 +465,8 @@ public class SensorService extends Service implements SensorEventListener, Noise
 			sensorBLEBeacon.removeListener(this);
 		} else if (sensorId == SensorDescConnectivity.SENSOR_ID) {
 			sensorConnectivity.removeListener(this);
+		} else if (sensorId == SensorDescNotification.SENSOR_ID) {
+		sensorConnectivity.removeListener(this);
 		}
 	}
 

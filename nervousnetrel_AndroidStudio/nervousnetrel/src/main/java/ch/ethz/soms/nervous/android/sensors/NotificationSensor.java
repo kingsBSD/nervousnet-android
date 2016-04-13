@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+//import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class NotificationSensor {
     }
 
     public void start() {
-        Log.d("sensor", "Notification Sensor Started");
+        //Log.d("sensor", "Notification Sensor Started");
         LocalBroadcastManager.getInstance(context).registerReceiver(
                 notificationReceiver, new IntentFilter("nervousnet-notification-sensor-event"));
     }
