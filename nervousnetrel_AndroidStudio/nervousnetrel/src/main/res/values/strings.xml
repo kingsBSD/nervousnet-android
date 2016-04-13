@@ -38,6 +38,9 @@
 		<item>Temperature</item>
 	</string-array>
 
+	<string name="accessibility_service_description">Enable this service to allow NervousNet to record when net-enabled apps send notifications. Notification
+	contents are not recorded</string>
+
 	<string name="title_activity_server_details">Proxy settings</string>
 	<string name="title_activity_sensor_frequency">Sensor logging interval</string>
 	<string name="title_activity_main_apps">Nervousnet Virtual Sensors</string>
