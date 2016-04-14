@@ -1,10 +1,15 @@
 package ch.ethz.soms.nervous.android;
 
+import java.util.List;
 import java.util.Random;
+
+import ch.ethz.soms.nervous.android.sensors.SensorDescNotification;
 import ch.ethz.soms.nervousnet.*;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+//import android.util.Log;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
@@ -15,6 +20,9 @@ import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.provider.Settings;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -203,6 +211,35 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	@TargetApi(17)
+	private boolean accessibilityEnabled() {
+		AccessibilityManager am = (AccessibilityManager) this.getSystemService(Context.ACCESSIBILITY_SERVICE);
+		List<AccessibilityServiceInfo> runningServices = am.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
+		for (AccessibilityServiceInfo service : runningServices) {
+			//Log.i("accessibility",service.getId());
+			if ("ch.ethz.soms.nervousnet/ch.ethz.soms.nervous.android.NotificationService".equals(service.getId())) return true;
+		}
+		return false;
+	}
+
+	private void accessibilityPrompt() {
+		AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(this);
+		myAlertDialog.setTitle(this.getString(R.string.accessibiliity_dialog_title));
+		myAlertDialog.setMessage(this.getString(R.string.accessibiliity_dialog_prompt));
+		myAlertDialog.setPositiveButton(this.getString(R.string.accessibiliity_dialog_confirm), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+			}});
+
+		myAlertDialog.setNegativeButton(this.getString(R.string.accessibiliity_dialog_cancel), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				// do something when the Cancel button is clicked
+			}});
+
+		myAlertDialog.show();
+
+	}
+
 	public void startStopSensorService(boolean on) {
 		if (on) {
 			SensorService.startService(this);
@@ -219,9 +256,13 @@ public class MainActivity extends Activity {
 				// This will only work on API level 18 or higher
 				initializeBluetooth();
 			}
-
+			// Can't get notification data unless the user authorizes the app as an accessibility service.
+			scs = sc.getInitialSensorCollectStatus(SensorDescNotification.SENSOR_ID);
+			if (scs.isCollect()) {
+				if (!accessibilityEnabled()) accessibilityPrompt();
+			}
 		} else {
-			SensorService.stopService(this);
+				SensorService.stopService(this);
 			UploadService.stopService(this);
 			serviceRunning = false;
 		}
