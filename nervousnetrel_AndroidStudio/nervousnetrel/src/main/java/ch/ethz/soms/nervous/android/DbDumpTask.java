@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import android.media.MediaScannerConnection;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.nio.channels.FileChannel;
@@ -136,10 +135,10 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         Date rightNow = new Date();
-        String exportPath = "NerousNet-" + df.format(rightNow) + ".sqlite";
+        String exportPath = "NervousNet-" + df.format(rightNow) + ".sqlite";
         File exportFile = new File(dest, exportPath);
 
-        File dbFile = new File(source, helper.getDbPath());
+        File dbFile = context.getDatabasePath(helper.DATABASE_NAME);
 
         FileChannel sourceStream = null, destStream = null;
 
@@ -147,7 +146,7 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
             sourceStream = new FileInputStream(dbFile).getChannel();
             destStream = new FileOutputStream(exportFile).getChannel();
             destStream.transferFrom(sourceStream, 0, sourceStream.size());
-            Toast.makeText(context, "Data Exported.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Data Exported to Downloads.", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(context, "Couldn't Export Data!", Toast.LENGTH_LONG).show();

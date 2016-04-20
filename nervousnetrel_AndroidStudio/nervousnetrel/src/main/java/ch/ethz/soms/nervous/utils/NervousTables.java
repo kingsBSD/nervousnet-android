@@ -6,7 +6,6 @@ package ch.ethz.soms.nervous.utils;
 
 import android.provider.BaseColumns;
 
-
 public class NervousTables {
 
     public NervousTables() {}
@@ -140,7 +139,7 @@ public class NervousTables {
     }
 
     static final String CREATE_MAGNETIC_TABLE =
-            "CREATE TABLE " + GyroscopeTable.TABLE_NAME + " (" +
+            "CREATE TABLE " + MagneticTable.TABLE_NAME + " (" +
                     INTEGER_PRIMARY_KEY +
                     MagneticTable.COLUMN_NAME_MAGNETIC_X + " REAL, " +
                     MagneticTable.COLUMN_NAME_MAGNETIC_Y + " REAL, " +
@@ -217,7 +216,6 @@ public class NervousTables {
             CREATE_MAGNETIC_TABLE,
             CREATE_NOISE_TABLE,
             CREATE_NOTIFICATION_TABLE,
-            CREATE_PRESSURE_TABLE,
             CREATE_PRESSURE_TABLE,
             CREATE_PROXIMITY_TABLE,
             CREATE_TEMPERATURE_TABLE
