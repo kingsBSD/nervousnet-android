@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import android.media.MediaScannerConnection;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
 import ch.ethz.soms.nervous.utils.NervousData;
+import ch.ethz.soms.nervous.utils.NervousTables;
 import ch.ethz.soms.nervousnet.R;
 
 /**
@@ -60,6 +62,7 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     private long timeStamp;
     private NervousData helper;
     private SQLiteDatabase db;
+    private String currentTable;
 
     public DbDumpTask(Context ctx) {
         context = ctx;
@@ -69,13 +72,12 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     @Override
     protected void onPreExecute() {
 
-        Log.d("db_dump", "pre");
-
         timeStamp = System.currentTimeMillis();
         db = helper.getWritableDatabase();
 
         progress = new ProgressDialog(context);
         progress.setTitle("Exporting Data");
+        progress.setMessage("...");
         progress.setCancelable(true);
         progress.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -89,22 +91,34 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
         progress.show();
     }
 
-
     @Override
     protected Integer doInBackground(Integer... params) {
 
+        currentTable = NervousTables.AccelerometerTable.TABLE_NAME;
         dumpAccelerometerData();
+        currentTable = NervousTables.BatteryTable.TABLE_NAME;
         dumpBatteryData();
+        currentTable = NervousTables.BLEBeaconTable.TABLE_NAME;;
         dumpBluetoothData();
+        currentTable = NervousTables.ConnectivityTable.TABLE_NAME;;
         dumpConnectivityData();
+        currentTable = NervousTables.GyroscopeTable.TABLE_NAME;;
         dumpGyroscopeData();
+        currentTable = NervousTables.HumidityTable.TABLE_NAME;;
         dumpHumidityData();
+        currentTable = NervousTables.LightTable.TABLE_NAME;
         dumpLightData();
+        currentTable = NervousTables.MagneticTable.TABLE_NAME;;
         dumpMagneticData();
+        currentTable = NervousTables.NoiseTable.TABLE_NAME;;
         dumpNoiseData();
+        currentTable = NervousTables.NotificationTable.TABLE_NAME;
         dumpNotificationData();
+        currentTable = NervousTables.PressureTable.TABLE_NAME;
         dumpPressureData();
+        currentTable = NervousTables.ProximityTable.TABLE_NAME;
         dumpProximityData();
+        currentTable = NervousTables.TemperatureTable.TABLE_NAME;
         dumpTemperatureData();
 
         return 0;
@@ -112,6 +126,8 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
 
     @Override
     protected void onPostExecute(Integer junk) {
+
+        progress.dismiss();
 
         db.close();
 
@@ -131,9 +147,10 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
             sourceStream = new FileInputStream(dbFile).getChannel();
             destStream = new FileOutputStream(exportFile).getChannel();
             destStream.transferFrom(sourceStream, 0, sourceStream.size());
+            Toast.makeText(context, "Data Exported.", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
-            //Toast.makeText(this, "Couldn't Export Data!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Couldn't Export Data!", Toast.LENGTH_LONG).show();
         } finally { // We don't want to be leaky
             closeResourceGracefully(sourceStream);
             closeResourceGracefully(destStream);
@@ -142,17 +159,34 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
         // http://stackoverflow.com/questions/13737261/nexus-4-not-showing-files-via-mtp
         MediaScannerConnection.scanFile(context, new String[]{exportFile.getAbsolutePath()}, null, null);
 
-        tidyUp();
+        context.deleteDatabase(helper.DATABASE_NAME);
     }
 
     @Override
     protected void onCancelled(Integer junk) {
-        tidyUp();
+        context.deleteDatabase(helper.DATABASE_NAME);
+        progress.dismiss();
     }
 
     @Override
     protected void onProgressUpdate(Integer... values) {
         progress.setProgress(values[0]);
+        switch (currentTable) {
+            case NervousTables.AccelerometerTable.TABLE_NAME: progress.setMessage("Exporting Accelerometer Data"); break;
+            case NervousTables.BatteryTable.TABLE_NAME: progress.setMessage("Exporting Battery Data"); break;
+            case NervousTables.BLEBeaconTable.TABLE_NAME: progress.setMessage("Exporting Bluetooth Data"); break;
+            case NervousTables.ConnectivityTable.TABLE_NAME: progress.setMessage("Exporting Connectivity Data"); break;
+            case NervousTables.GyroscopeTable.TABLE_NAME: progress.setMessage("Exporting Gyroscope Data"); break;
+            case NervousTables.HumidityTable.TABLE_NAME: progress.setMessage("Exporting Humidity Data"); break;
+            case NervousTables.LightTable.TABLE_NAME: progress.setMessage("Exporting Light Data"); break;
+            case NervousTables.MagneticTable.TABLE_NAME: progress.setMessage("Exporting Magnetic Data"); break;
+            case NervousTables.NoiseTable.TABLE_NAME: progress.setMessage("Exporting Noise Data"); break;
+            case NervousTables.NotificationTable.TABLE_NAME: progress.setMessage("Exporting Notification Data"); break;
+            case NervousTables.PressureTable.TABLE_NAME: progress.setMessage("Exporting Pressure Data"); break;
+            case NervousTables.ProximityTable.TABLE_NAME: progress.setMessage("Exporting Proximity Data"); break;
+            case NervousTables.TemperatureTable.TABLE_NAME: progress.setMessage("Exporting Temperature Data"); break;
+            default: progress.setMessage("...");
+        }
     }
 
     private static void closeResourceGracefully(Closeable closeMe) {
@@ -163,11 +197,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
                 // It was already closed, ignore.
             }
         }
-    }
-
-    private void tidyUp() {
-        context.deleteDatabase(helper.DATABASE_NAME);
-        progress.dismiss();
     }
 
     private class Ticker {
@@ -191,7 +220,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpAccelerometerData() {
-        //progress.setTitle("Exporting Acclerometer Data");
         SensorQueriesAccelerometer sensorQuery = new SensorQueriesAccelerometer(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -204,7 +232,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpBatteryData() {
-        //progress.setTitle("Exporting Battery Data");
         SensorQueriesBattery sensorQuery = new SensorQueriesBattery(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -217,7 +244,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpBluetoothData() {
-        //progress.setTitle("Exporting Bluetooth Data");
         SensorQueriesBLEBeacon sensorQuery = new SensorQueriesBLEBeacon(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -230,7 +256,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpConnectivityData() {
-        //progress.setTitle("Exporting Connectivity Data");
         SensorQueriesConnectivity sensorQuery = new SensorQueriesConnectivity(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -243,7 +268,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpGyroscopeData() {
-        //progress.setTitle("Exporting Gyroscope Data");
         SensorQueriesGyroscope sensorQuery = new SensorQueriesGyroscope(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -256,7 +280,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpHumidityData() {
-        //progress.setTitle("Exporting Humidity Data");
         SensorQueriesHumidity sensorQuery = new SensorQueriesHumidity(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -269,7 +292,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpLightData() {
-        //progress.setTitle("Exporting Light Data");
         SensorQueriesLight sensorQuery = new SensorQueriesLight(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -282,7 +304,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpMagneticData() {
-        //progress.setTitle("Exporting Magnetic Data");
         SensorQueriesMagnetic sensorQuery = new SensorQueriesMagnetic(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -295,7 +316,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpNoiseData() {
-        //progress.setTitle("Exporting Noise Data");
         SensorQueriesNoise sensorQuery = new SensorQueriesNoise(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -308,7 +328,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpNotificationData() {
-        //progress.setTitle("Exporting Notification Data");
         SensorQueriesNotification sensorQuery = new SensorQueriesNotification(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -321,7 +340,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpPressureData() {
-        //progress.setTitle("Exporting Pressure Data");
         SensorQueriesPressure sensorQuery = new SensorQueriesPressure(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -334,7 +352,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpProximityData() {
-        //progress.setTitle("Exporting Proximity Data");
         SensorQueriesProximity sensorQuery = new SensorQueriesProximity(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
@@ -347,7 +364,6 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
     }
 
     private void dumpTemperatureData() {
-        //progress.setTitle("Exporting Temperature Data");
         SensorQueriesTemperature sensorQuery = new SensorQueriesTemperature(0, timeStamp, context.getFilesDir());
         if (sensorQuery.containsReadings()) {
             Ticker ticker = new Ticker(sensorQuery.getCount());
