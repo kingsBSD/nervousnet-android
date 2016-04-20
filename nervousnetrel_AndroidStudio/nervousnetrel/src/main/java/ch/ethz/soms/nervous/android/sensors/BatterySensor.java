@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ch.ethz.soms.nervous.android.sensors.NoiseSensor.NoiseListener;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;

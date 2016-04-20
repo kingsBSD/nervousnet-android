@@ -32,25 +32,7 @@ public class SensorQueriesAccelerometer extends QueryNumVectorValue<SensorDescAc
 		// TODO Auto-generated method stub
 		return new SensorDescAccelerometerNew(0, 0, 0, 0);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	/*public SensorDescAccelerometerNew getMaxAverageValue() {
 	SensorDescAccelerometerNew maxAccSensDesc = null;
 	float maxAverage = 0;

@@ -35,22 +35,6 @@ public class SensorQueriesGyroscope extends QueryNumVectorValue<SensorDescGyrosc
 		// TODO Auto-generated method stub
 		return new SensorDescGyroscopeNew(0, 0, 0, 0);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	/*public SensorDescGyroscopeNew getMaxAverageValue() {
 		SensorDescGyroscopeNew maxGyrSensDesc = null;
