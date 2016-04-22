@@ -29,7 +29,7 @@ public class SensorDescSocket extends SensorDesc {
 
     public String getAppName() {return appName;}
     public String getProtocol() {return protocol;}
-    public int getPortl() {return port;}
+    public int getPort() {return port;}
 
     @Override
     public long getSensorId() {return SENSOR_ID;}

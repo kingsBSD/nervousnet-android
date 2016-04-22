@@ -194,6 +194,21 @@ public class NervousTables {
                     ProximityTable.COLUMN_NAME_PROXIMITY + " REAL, " +
                     ProximityTable.COLUMN_NAME_TIMESTAMP + " INTEGER );";
 
+    public static abstract class SocketTable extends NervousTable implements BaseColumns {
+        public static final String TABLE_NAME = "socket";
+        public static final String COLUMN_NAME_SOCKET_APP_NAME = "appname";
+        public static final String COLUMN_NAME_SOCKET_PROTOCOL = "protocol";
+        public static final String COLUMN_NAME_SOCKET_PORT = "port";
+    }
+
+    static final String CREATE_SOCKET_TABLE =
+            "CREATE TABLE " + SocketTable.TABLE_NAME + " (" +
+                    INTEGER_PRIMARY_KEY +
+                    SocketTable.COLUMN_NAME_SOCKET_APP_NAME + " TEXT, " +
+                    SocketTable.COLUMN_NAME_SOCKET_PROTOCOL + " TEXT, " +
+                    SocketTable.COLUMN_NAME_SOCKET_PORT + " INTEGER, " +
+                    SocketTable.COLUMN_NAME_TIMESTAMP + " INTEGER );";
+
     public static abstract class TemperatureTable extends NervousTable implements BaseColumns {
         public static final String TABLE_NAME = "temperature";
         public static final String COLUMN_NAME_TEMPERATURE = "temperature";
@@ -233,6 +248,7 @@ public class NervousTables {
             CREATE_NOTIFICATION_TABLE,
             CREATE_PRESSURE_TABLE,
             CREATE_PROXIMITY_TABLE,
+            CREATE_SOCKET_TABLE,
             CREATE_TEMPERATURE_TABLE,
             CREATE_TRAFFIC_TABLE
     };

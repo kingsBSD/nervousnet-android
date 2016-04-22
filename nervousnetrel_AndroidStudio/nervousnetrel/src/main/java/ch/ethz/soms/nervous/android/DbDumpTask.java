@@ -33,6 +33,7 @@ import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesNoise;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesNotification;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesPressure;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesProximity;
+import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesSocket;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesTemperature;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesTraffic;
 import ch.ethz.soms.nervous.android.sensors.SensorDescAccelerometerNew;
@@ -47,6 +48,7 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescNoise;
 import ch.ethz.soms.nervous.android.sensors.SensorDescNotification;
 import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
+import ch.ethz.soms.nervous.android.sensors.SensorDescSocket;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
 import ch.ethz.soms.nervous.utils.NervousData;
@@ -119,6 +121,8 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
         dumpPressureData();
         currentTable = NervousTables.ProximityTable.TABLE_NAME;
         dumpProximityData();
+        currentTable = NervousTables.SocketTable.TABLE_NAME;
+        dumpSocketData();
         currentTable = NervousTables.TemperatureTable.TABLE_NAME;
         dumpTemperatureData();
         currentTable = NervousTables.TrafficTable.TABLE_NAME;
@@ -187,6 +191,7 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
             case NervousTables.NotificationTable.TABLE_NAME: progress.setMessage("Exporting Notification Data"); break;
             case NervousTables.PressureTable.TABLE_NAME: progress.setMessage("Exporting Pressure Data"); break;
             case NervousTables.ProximityTable.TABLE_NAME: progress.setMessage("Exporting Proximity Data"); break;
+            case NervousTables.SocketTable.TABLE_NAME: progress.setMessage("Exporting Network Socket Data"); break;
             case NervousTables.TemperatureTable.TABLE_NAME: progress.setMessage("Exporting Temperature Data"); break;
             case NervousTables.TrafficTable.TABLE_NAME: progress.setMessage("Exporting Network Traffic Data"); break;
             default: progress.setMessage("...");
@@ -362,6 +367,18 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
             ArrayList<SensorDescProximity> sensorDescs = sensorQuery.getSensorDescriptorList();
             for (SensorDescProximity desc : sensorDescs) {
                 helper.putProximityData(db, desc);
+                ticker.tick();
+            }
+        }
+    }
+
+    private void dumpSocketData() {
+        SensorQueriesSocket sensorQuery = new SensorQueriesSocket(0, timeStamp, context.getFilesDir());
+        if (sensorQuery.containsReadings()) {
+            Ticker ticker = new Ticker(sensorQuery.getCount());
+            ArrayList<SensorDescSocket> sensorDescs = sensorQuery.getSensorDescriptorList();
+            for (SensorDescSocket desc : sensorDescs) {
+                helper.putSocketData(db, desc);
                 ticker.tick();
             }
         }

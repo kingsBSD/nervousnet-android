@@ -22,6 +22,7 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescNoise;
 import ch.ethz.soms.nervous.android.sensors.SensorDescNotification;
 import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
+import ch.ethz.soms.nervous.android.sensors.SensorDescSocket;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
 
 import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
@@ -184,6 +185,15 @@ public class NervousData extends SQLiteOpenHelper {
 		values.put(ProximityTable.COLUMN_NAME_PROXIMITY, proximity.getProximity());
 		values.put(ProximityTable.COLUMN_NAME_TIMESTAMP, proximity.getTimestamp());
 		putRow(db, ProximityTable.TABLE_NAME, values);
+	}
+
+	public void putSocketData(SQLiteDatabase db, SensorDescSocket socket) {
+		ContentValues values = new ContentValues();
+		values.put(NervousTables.SocketTable.COLUMN_NAME_SOCKET_APP_NAME, socket.getAppName());
+		values.put(NervousTables.SocketTable.COLUMN_NAME_SOCKET_PROTOCOL, socket.getProtocol());
+		values.put(NervousTables.SocketTable.COLUMN_NAME_SOCKET_PORT, socket.getPort());
+		values.put(NervousTables.SocketTable.COLUMN_NAME_TIMESTAMP, socket.getTimestamp());
+		putRow(db, NervousTables.SocketTable.TABLE_NAME, values);
 	}
 
 	public void putTemperatureData(SQLiteDatabase db, SensorDescTemperature temperature) {
