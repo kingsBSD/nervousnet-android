@@ -25,9 +25,7 @@ public class SensorDescNotification extends SensorDesc {
     public String getAppName() {return appName;}
 
     @Override
-    public long getSensorId() {
-        return SENSOR_ID;
-    }
+    public long getSensorId() {return SENSOR_ID;}
 
     @Override
     public SensorData toProtoSensor() {
