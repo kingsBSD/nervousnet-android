@@ -390,5 +390,5 @@ public class DbDumpTask extends AsyncTask<Integer, Integer, Integer> {
             }
         }
     }
-    
+
 }
