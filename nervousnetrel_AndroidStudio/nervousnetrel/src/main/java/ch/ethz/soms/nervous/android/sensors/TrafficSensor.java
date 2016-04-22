@@ -113,12 +113,12 @@ public class TrafficSensor {
             for (Integer uid : uids) {
                 txBytes = 0;
                 rxBytes = 0;
-                bytes = TrafficStats.getUidTxBytes(uid);
+                bytes = TrafficStats.getUidTxBytes(uid) - trafficTxByUid.get(uid);
                 if (bytes > trafficTxByUid.get(uid)) {
                     txBytes = bytes;
                     trafficTxByUid.put(uid, bytes);
                 }
-                bytes = TrafficStats.getUidRxBytes(uid);
+                bytes = TrafficStats.getUidRxBytes(uid) - trafficTxByUid.get(uid);
                 if (bytes > trafficRxByUid.get(uid)) {
                     rxBytes = bytes;
                     trafficRxByUid.put(uid, bytes);
