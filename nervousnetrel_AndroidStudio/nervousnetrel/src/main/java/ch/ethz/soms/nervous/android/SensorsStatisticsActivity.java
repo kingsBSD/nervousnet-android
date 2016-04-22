@@ -38,6 +38,7 @@ import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesGyroscope;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesHumidity;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesLight;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesMagnetic;
+import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesNotification;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesPressure;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesProximity;
 import ch.ethz.soms.nervous.android.sensorQueries.SensorQueriesTemperature;
@@ -50,10 +51,13 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescHumidity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescLight;
 import ch.ethz.soms.nervous.android.sensors.SensorDescMagnetic;
 import ch.ethz.soms.nervous.android.sensors.SensorDescMagneticNew;
+import ch.ethz.soms.nervous.android.sensors.SensorDescNotification;
 import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
+import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
 import ch.ethz.soms.nervous.utils.HighlightArrayAdapter;
+import ch.ethz.soms.nervous.utils.NotificationHistogram;
 import ch.ethz.soms.nervousnet.R;
 
 public class SensorsStatisticsActivity extends Activity {
@@ -104,6 +108,10 @@ public class SensorsStatisticsActivity extends Activity {
 //    	{
 //    		sensors.add("Noise");
 //    	}
+		if(SensorConfiguration.getInstance(getApplicationContext()).getInitialSensorCollectStatus(SensorDescNotification.SENSOR_ID).isCollect())
+		{
+			sensors.add("Notifications");
+		}
     	if(SensorConfiguration.getInstance(getApplicationContext()).getInitialSensorCollectStatus(SensorDescPressure.SENSOR_ID).isCollect())
     	{
     		sensors.add("Pressure");
@@ -116,6 +124,10 @@ public class SensorsStatisticsActivity extends Activity {
     	{
     		sensors.add("Temperature");
     	}
+		if(SensorConfiguration.getInstance(getApplicationContext()).getInitialSensorCollectStatus(SensorDescTraffic.SENSOR_ID).isCollect())
+		{
+			sensors.add("Network Traffic");
+		}
     	
     	return sensors.toArray(new String[sensors.size()]);
     }
@@ -154,7 +166,7 @@ public class SensorsStatisticsActivity extends Activity {
     
     public void nextButtonRealTimeClicked(View view)
     {
-    	/* Button to show real time plots clicked */	
+    	/* Button to show real time plots clicked */
     	if(!serviceSwitchIsChecked)
     	{
     		//If sensor data reading is disable
@@ -665,7 +677,33 @@ public class SensorsStatisticsActivity extends Activity {
             	webView.putExtra("type_of_plot", "3_lines_live_data_over_time");
             	startActivity(webView);
             }
-        } else if (selected_sensor.equalsIgnoreCase("Proximity"))
+        } else if (selected_sensor.equalsIgnoreCase("Notifications")) {
+			javascript_variables = "var curve_name = " + "'Notifications';" +
+					"var unit_of_meas = " + "'';" +
+					"var x_axis_title = " + "'Hour';" +
+					"var y_axis_title = " + "'Notifications';" +
+					"var plot_title = " + "'Notification data';" +
+					"var plot_subtitle = " + "'';";
+			if (!realTime)
+			{
+				SensorQueriesNotification notificationQuery = new SensorQueriesNotification(
+						fromTimestamp, toTimestamp, getFilesDir());
+				if (notificationQuery.containsReadings())
+				{
+					String data_array = NotificationHistogram.build(notificationQuery,null);
+					javascript_variables += "var data_array = " + data_array;
+					webView.putExtra("javascript_global_variables",javascript_variables);
+					webView.putExtra("type_of_plot", "1_line_plot_over_time");
+					startActivity(webView);
+				} else {
+					Toast.makeText(getApplicationContext(), "No data found in this range.", Toast.LENGTH_LONG).show();
+				}
+			} else {
+				Toast.makeText(getApplicationContext(), "Realtime data is not available for this sensor.", Toast.LENGTH_LONG).show();
+			}
+
+		}
+		else if (selected_sensor.equalsIgnoreCase("Proximity"))
         {
         	javascript_variables = "var curve_name = " + "'Proximity';" +
                     "var unit_of_meas = " + "'cm';" +
@@ -673,7 +711,7 @@ public class SensorsStatisticsActivity extends Activity {
                     "var y_axis_title = " + "'Proximity (cm)';" +
                     "var plot_title = " + "'Proximity data';" +
                     "var plot_subtitle = " + "'';";
-        	
+
         	if(!realTime)
             {
 	            SensorQueriesProximity sensorQ_Proximity = new SensorQueriesProximity(
@@ -682,14 +720,15 @@ public class SensorsStatisticsActivity extends Activity {
 	            {
 	                ArrayList<SensorDescProximity> sensorDescs = sensorQ_Proximity.getSensorDescriptorList();
 	                SensorDescProximity sensorDesc;
-	
+
 	                String data_array = "[";
-	
+
 	                Calendar c = Calendar.getInstance();
-	
+
 	                int increment = (int)Math.ceil(sensorDescs.size()/MAX_NUMBER_PLOT_POINTS);
-	
+
 	                //TODO move extraction of year month day hr min sec into sensor maybe or in one unique place, don't replicate code
+					// Yes, I know, horriblr isn't it? -GRG, 22/04/16.
 	                for(int i=0;i<sensorDescs.size();i+=increment)
 	                {
 	                    sensorDesc = sensorDescs.get(i);
@@ -700,7 +739,7 @@ public class SensorsStatisticsActivity extends Activity {
 	                    int hr = c.get(Calendar.HOUR_OF_DAY);
 	                    int min = c.get(Calendar.MINUTE);
 	                    int sec = c.get(Calendar.SECOND);
-	
+
 	                    data_array+="[Date.UTC("+mYear+","+mMonth+","+mDay+","+hr+","+min+","+sec+"),"+sensorDesc.getProximity()+"],";
 	//TODO for connectivity plot
 	//                    if(sensorDesc.getProximity()>966)
@@ -709,9 +748,9 @@ public class SensorsStatisticsActivity extends Activity {
 	//                    	data_array+="{x: Date.UTC("+mYear+","+mMonth+","+mDay+","+hr+","+min+","+sec+"), y: "+sensorDesc.getProximity()+"},";
 	                }
 	                data_array = data_array.substring(0,data_array.length()-1)+"]; ";
-	
+
 	                javascript_variables+= "var data_array = " + data_array;
-	                
+
 	                webView.putExtra("javascript_global_variables",javascript_variables);
 	                webView.putExtra("type_of_plot", "1_line_plot_over_time");
 	                startActivity(webView);
@@ -730,7 +769,7 @@ public class SensorsStatisticsActivity extends Activity {
                     "var y_axis_title = " + "'Temperature(Deg Celsius)';" +
                     "var plot_title = " + "'Temperature data';" +
                     "var plot_subtitle = " + "'';";
-        	
+
         	if(!realTime)
             {
 	            SensorQueriesTemperature sensorQ_Temperature= new SensorQueriesTemperature(
@@ -739,13 +778,13 @@ public class SensorsStatisticsActivity extends Activity {
 	            {
 	                ArrayList<SensorDescTemperature> sensorDescs = sensorQ_Temperature.getSensorDescriptorList();
 	                SensorDescTemperature sensorDesc;
-	
+
 	                String data_array = "[";
-	
+
 	                Calendar c = Calendar.getInstance();
-	
+
 	                int increment = (int)Math.ceil(sensorDescs.size()/MAX_NUMBER_PLOT_POINTS);
-	
+
 	                //TODO move extraction of year month day hr min sec into sensor maybe or in one unique place, don't replicate code
 	                for(int i=0;i<sensorDescs.size();i+=increment)
 	                {
@@ -757,13 +796,13 @@ public class SensorsStatisticsActivity extends Activity {
 	                    int hr = c.get(Calendar.HOUR_OF_DAY);
 	                    int min = c.get(Calendar.MINUTE);
 	                    int sec = c.get(Calendar.SECOND);
-	
+
 	                    data_array+="[Date.UTC("+mYear+","+mMonth+","+mDay+","+hr+","+min+","+sec+"),"+sensorDesc.getTemperature()+"],";
 	                }
 	                data_array = data_array.substring(0,data_array.length()-1)+"]; ";
-	
+
 	                javascript_variables+="var data_array = " + data_array;
-	                
+
 	                webView.putExtra("javascript_global_variables",javascript_variables);
 	                webView.putExtra("type_of_plot", "1_line_plot_over_time");
 	                startActivity(webView);
@@ -790,13 +829,13 @@ public class SensorsStatisticsActivity extends Activity {
 	            {
 	                ArrayList<SensorDescPressure> sensorDescs = sensorQ_Pressure.getSensorDescriptorList();
 	                SensorDescPressure sensorDesc;
-	
+
 	                String data_array = "[";
-	
+
 	                Calendar c = Calendar.getInstance();
-	
+
 	                int increment = (int)Math.ceil(sensorDescs.size()/MAX_NUMBER_PLOT_POINTS);
-	
+
 	                //TODO move extraction of year month day hr min sec into sensor maybe or in one unique place, don't replicate code
 	                for(int i=0;i<sensorDescs.size();i+=increment)
 	                {
@@ -808,13 +847,13 @@ public class SensorsStatisticsActivity extends Activity {
 	                    int hr = c.get(Calendar.HOUR_OF_DAY);
 	                    int min = c.get(Calendar.MINUTE);
 	                    int sec = c.get(Calendar.SECOND);
-	
+
 	                    data_array+="[Date.UTC("+mYear+","+mMonth+","+mDay+","+hr+","+min+","+sec+"),"+sensorDesc.getPressure()+"],";
 	                }
 	                data_array = data_array.substring(0,data_array.length()-1)+"]; ";
-	
+
 	                javascript_variables+= "var data_array = " + data_array;
-	                
+
 	                webView.putExtra("javascript_global_variables",javascript_variables);
 	                webView.putExtra("type_of_plot", "1_line_plot_over_time");
 	                startActivity(webView);
@@ -825,7 +864,7 @@ public class SensorsStatisticsActivity extends Activity {
             	webView.putExtra("type_of_plot", "1_line_live_data_over_time");
             	startActivity(webView);
             }
-        } 
+        }
         //TODO NOISE (API not ready)
         //TODO MICROPHONE (API not ready)
         //TODO CONNECTIVITY (API not ready)
