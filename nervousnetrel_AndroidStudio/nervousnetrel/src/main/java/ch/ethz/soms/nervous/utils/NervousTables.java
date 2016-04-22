@@ -205,6 +205,21 @@ public class NervousTables {
                     TemperatureTable.COLUMN_NAME_TEMPERATURE + " REAL, " +
                     TemperatureTable.COLUMN_NAME_TIMESTAMP + " INTEGER );";
 
+    public static abstract class TrafficTable extends NervousTable implements BaseColumns {
+        public static final String TABLE_NAME = "traffic";
+        public static final String COLUMN_NAME_TRAFFIC_APP_NAME = "appname";
+        public static final String COLUMN_NAME_TRAFFIC_BYTES_IN = "bytesin";
+        public static final String COLUMN_NAME_TRAFFIC_BYTES_OUT = "bytesout";
+    }
+
+    static final String CREATE_TRAFFIC_TABLE =
+            "CREATE TABLE " + TrafficTable.TABLE_NAME + " (" +
+                    INTEGER_PRIMARY_KEY +
+                    TrafficTable.COLUMN_NAME_TRAFFIC_APP_NAME + " TEXT, " +
+                    TrafficTable.COLUMN_NAME_TRAFFIC_BYTES_IN + " INTEGER, " +
+                    TrafficTable.COLUMN_NAME_TRAFFIC_BYTES_OUT + " INTEGER, " +
+                    TrafficTable.COLUMN_NAME_TIMESTAMP + " INTEGER );";
+
     public static final String[] CreateTables = {
             CREATE_ACCELEROMETER_TABLE,
             CREATE_BATTERY_TABLE,
@@ -218,9 +233,8 @@ public class NervousTables {
             CREATE_NOTIFICATION_TABLE,
             CREATE_PRESSURE_TABLE,
             CREATE_PROXIMITY_TABLE,
-            CREATE_TEMPERATURE_TABLE
+            CREATE_TEMPERATURE_TABLE,
+            CREATE_TRAFFIC_TABLE
     };
 
 }
-
-

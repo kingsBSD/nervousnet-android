@@ -24,6 +24,7 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
 
+import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
 import ch.ethz.soms.nervous.utils.NervousTables.AccelerometerTable;
 import ch.ethz.soms.nervous.utils.NervousTables.BatteryTable;
 import ch.ethz.soms.nervous.utils.NervousTables.BLEBeaconTable;
@@ -50,19 +51,6 @@ public class NervousData extends SQLiteOpenHelper {
 	public NervousData(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
-
-//	private SQLiteDatabase sqldb;
-//
-//	private final String name;
-//	private final String dbPath;
-//	private final Context context;
-//
-//	public NervousData(Context context, String name) {
-//		super(context, name, null, 1);
-//		this.dbPath = context.getDatabasePath(name).getAbsolutePath();
-//		this.context = context;
-//		this.name = name;
-//	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -203,6 +191,14 @@ public class NervousData extends SQLiteOpenHelper {
 		values.put(TemperatureTable.COLUMN_NAME_TEMPERATURE, temperature.getTemperature());
 		values.put(TemperatureTable.COLUMN_NAME_TIMESTAMP, temperature.getTimestamp());
 		putRow(db, TemperatureTable.TABLE_NAME, values);
+	}
+
+	public void putTrafficData(SQLiteDatabase db, SensorDescTraffic traffic) {
+		ContentValues values = new ContentValues();
+		values.put(NervousTables.TrafficTable.COLUMN_NAME_TRAFFIC_APP_NAME, traffic.getAppName());
+		values.put(NervousTables.TrafficTable.COLUMN_NAME_TRAFFIC_BYTES_IN, traffic.getbytesIn());
+		values.put(NervousTables.TrafficTable.COLUMN_NAME_TRAFFIC_BYTES_OUT, traffic.getbytesOut());
+		putRow(db, NervousTables.TrafficTable.TABLE_NAME, values);
 	}
 
 	private void putBoolean(ContentValues values, String column, boolean bool) {
