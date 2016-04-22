@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-//import android.util.Log;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,14 @@ public class NotificationSensor {
 
     public NotificationSensor(Context context) {
         this.context = context;
+        isActive = false;
     }
 
     private Lock listenerMutex = new ReentrantLock();
 
     private List<NotificationListener> listenerList = new ArrayList<NotificationListener>();
+
+    private boolean isActive;
 
     public interface NotificationListener {
         void notificationSensorDataReady(long timestamp, String appName);
@@ -58,14 +61,26 @@ public class NotificationSensor {
     }
 
     public void start() {
-        //Log.d("sensor", "Notification Sensor Started");
-        LocalBroadcastManager.getInstance(context).registerReceiver(
-                notificationReceiver, new IntentFilter("nervousnet-notification-sensor-event"));
+        Log.d("notification", "Notification Sensor Started");
+        if (! isActive) {
+            LocalBroadcastManager.getInstance(context).registerReceiver(
+                    notificationReceiver, new IntentFilter("nervousnet-notification-sensor-event"));
+            isActive = true;
+        }
+    }
+
+    public void stop() {
+        if (isActive) {
+            Log.d("notification", "Notification Sensor Stopped");
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(notificationReceiver);
+            isActive = false;
+        }
     }
 
     private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d("notification", "Transmitted notification data");
             dataReady(intent.getLongExtra("timestamp",0L),intent.getStringExtra("appName"));
         }
     };

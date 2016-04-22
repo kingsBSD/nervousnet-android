@@ -12,6 +12,7 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescNoise;
 import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
+import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
 import ch.ethz.soms.nervous.utils.NervousStatics;
 import ch.ethz.soms.nervousnet.R;
 import android.app.Activity;
@@ -35,7 +36,7 @@ public class SensorFrequencyActivity extends Activity {
 	ListView listSensorFrequency;
 	String[] sensorNames = { "Accelerometer", "Battery", "BLEBeacon",
 			"Connectivity", "Gyroscope", "Humidity", "Light", "Magnetic",
-			"Noise", "Pressure", "Proximity", "Temperature" };
+			"Noise", "Pressure", "Proximity", "Temperature", "Network Traffic" };
 	String[] arrFrequency = { "30 sec", "1 min", "2 min", "3 min", "5 min",
 			"10 min", "15 min", "20 min", "30 min", "45 min", "1 h", "2 h",
 			"10 h", "12 h", "1 d", "2 d", "5 d", "1 w", "2 w", "1 m"};
@@ -57,7 +58,7 @@ public class SensorFrequencyActivity extends Activity {
 			SensorDescHumidity.SENSOR_ID, SensorDescLight.SENSOR_ID,
 			SensorDescMagnetic.SENSOR_ID, SensorDescNoise.SENSOR_ID,
 			SensorDescPressure.SENSOR_ID, SensorDescProximity.SENSOR_ID,
-			SensorDescTemperature.SENSOR_ID };
+			SensorDescTemperature.SENSOR_ID, SensorDescTraffic.SENSOR_ID};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

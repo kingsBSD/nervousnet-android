@@ -46,9 +46,12 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescNotification;
 import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
+import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
+import ch.ethz.soms.nervous.android.sensors.TrafficSensor;
+import ch.ethz.soms.nervous.android.sensors.TrafficSensor.TrafficListener;
 
 public class SensorService extends Service implements SensorEventListener, NoiseListener, BatteryListener, BLEBeaconListener,
-		ConnectivityListener, NotificationListener {
+		ConnectivityListener, NotificationListener, TrafficListener {
 
 	private static final String LOG_TAG = SensorService.class.getSimpleName();
 
@@ -77,6 +80,7 @@ public class SensorService extends Service implements SensorEventListener, Noise
 	private NoiseSensor sensorNoise = null;
 	private BLESensor sensorBLEBeacon = null;
 	private NotificationSensor sensorNotification = null;
+	private TrafficSensor sensorTraffic = null;
 
 	// Those need to be reset on every collect call
 	private SensorCollectStatus scAccelerometer = null;
@@ -92,6 +96,7 @@ public class SensorService extends Service implements SensorEventListener, Noise
 	private SensorCollectStatus scBLEBeacon = null;
 	private SensorCollectStatus scConnectivity = null;
 	private SensorCollectStatus scNotification = null;
+	private SensorCollectStatus scTraffic = null;
 
 	// Threadsafe because handling can get called from different threads
 	private ConcurrentHashMap<Long, SensorCollectStatus> sensorCollected;
@@ -130,6 +135,7 @@ public class SensorService extends Service implements SensorEventListener, Noise
 		scBLEBeacon = sensorConfiguration.getInitialSensorCollectStatus(SensorDescBLEBeacon.SENSOR_ID);
 		scConnectivity = sensorConfiguration.getInitialSensorCollectStatus(SensorDescConnectivity.SENSOR_ID);
 		scNotification = sensorConfiguration.getInitialSensorCollectStatus(SensorDescNotification.SENSOR_ID);
+		scTraffic = sensorConfiguration.getInitialSensorCollectStatus(SensorDescTraffic.SENSOR_ID);
 
 		// Get references to android default sensors
 		sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -147,6 +153,7 @@ public class SensorService extends Service implements SensorEventListener, Noise
 		sensorBLEBeacon = new BLESensor(getApplicationContext());
 		sensorNoise = new NoiseSensor();
 		sensorNotification = new NotificationSensor(getApplicationContext());
+		sensorTraffic = new TrafficSensor(getApplicationContext());
 
 		// Schedule all sensors (initially)
 		scheduleSensor(SensorDescAccelerometer.SENSOR_ID);
@@ -162,6 +169,7 @@ public class SensorService extends Service implements SensorEventListener, Noise
 		scheduleSensor(SensorDescConnectivity.SENSOR_ID);
 		scheduleSensor(SensorDescBattery.SENSOR_ID);
 		scheduleSensor(SensorDescNotification.SENSOR_ID);
+		scheduleSensor(SensorDescTraffic.SENSOR_ID);
 
 		Log.d(LOG_TAG, "Service execution started");
 		return START_STICKY;
@@ -262,8 +270,18 @@ public class SensorService extends Service implements SensorEventListener, Noise
 						sensorNotification.clearListeners();
 						sensorNotification.addListener(sensorListenerClass);
 						sensorNotification.start();
+					} else {
+						sensorNotification.stop();
 					}
 					sensorCollectStatus = scNotification;
+				} else if (sensorId == SensorDescTraffic.SENSOR_ID) {
+					doCollect = scTraffic.isCollect();
+					if (doCollect) {
+						sensorTraffic.clearListeners();
+						sensorTraffic.addListener(sensorListenerClass);
+						sensorTraffic.start();
+					}
+					sensorCollectStatus = scTraffic;
 				}
 
 				if (doCollect && sensorCollectStatus != null) {
@@ -414,6 +432,15 @@ public class SensorService extends Service implements SensorEventListener, Noise
 		store(sensorDesc.getSensorId(), sensorDescs);
 	}
 
+	@Override
+	public void trafficSensorDataReady(long timestamp, String appName, long bytesIn, long bytesOut) {
+		SensorDesc sensorDesc = new SensorDescTraffic(timestamp, appName, bytesIn, bytesOut);
+		ArrayList<SensorDesc> sensorDescs = new ArrayList<SensorDesc>();
+		Log.d(LOG_TAG, "Traffic data collected");
+		sensorDescs.add(sensorDesc);
+		store(sensorDesc.getSensorId(), sensorDescs);
+	}
+
 	private synchronized void store(long sensorId, List<SensorDesc> sensorDescs) {		
 		storeMutex.lock();
 		SensorCollectStatus scs = sensorCollected.get(sensorId);
@@ -467,6 +494,8 @@ public class SensorService extends Service implements SensorEventListener, Noise
 			sensorConnectivity.removeListener(this);
 		} else if (sensorId == SensorDescNotification.SENSOR_ID) {
 		sensorConnectivity.removeListener(this);
+		} else if (sensorId == SensorDescTraffic.SENSOR_ID) {
+
 		}
 	}
 

@@ -13,6 +13,7 @@ import ch.ethz.soms.nervous.android.sensors.SensorDescPressure;
 import ch.ethz.soms.nervous.android.sensors.SensorDescProximity;
 import ch.ethz.soms.nervous.android.sensors.SensorDescTemperature;
 import ch.ethz.soms.nervous.android.sensors.SensorDescNotification;
+import ch.ethz.soms.nervous.android.sensors.SensorDescTraffic;
 import ch.ethz.soms.nervous.utils.NervousStatics;
 import ch.ethz.soms.nervousnet.R;
 import android.app.Activity;
@@ -37,10 +38,12 @@ import android.widget.Toast;
 public class SensorLoggingToggleActivity extends Activity {
 
 	ListView listSensorLoggingToggle;
-	String[] sensorNames = { "Accelerometer", "Battery", "BLEBeacon", "Connectivity", "Gyroscope", "Humidity", "Light", "Magnetic", "Noise", "Pressure", "Proximity", "Temperature", "Notifications" };
-	long[] sensorIds = { SensorDescAccelerometer.SENSOR_ID, SensorDescBattery.SENSOR_ID, SensorDescBLEBeacon.SENSOR_ID, SensorDescConnectivity.SENSOR_ID,
-			SensorDescGyroscope.SENSOR_ID, SensorDescHumidity.SENSOR_ID, SensorDescLight.SENSOR_ID, SensorDescMagnetic.SENSOR_ID, SensorDescNoise.SENSOR_ID,
-			SensorDescPressure.SENSOR_ID, SensorDescProximity.SENSOR_ID, SensorDescTemperature.SENSOR_ID, SensorDescNotification.SENSOR_ID };
+	String[] sensorNames = { "Accelerometer", "Battery", "BLEBeacon", "Connectivity", "Gyroscope", "Humidity", "Light", "Magnetic", "Noise",
+			"Pressure", "Proximity", "Temperature", "Notifications", "Network Traffic" };
+	long[] sensorIds = { SensorDescAccelerometer.SENSOR_ID, SensorDescBattery.SENSOR_ID, SensorDescBLEBeacon.SENSOR_ID,
+			SensorDescConnectivity.SENSOR_ID, SensorDescGyroscope.SENSOR_ID, SensorDescHumidity.SENSOR_ID, SensorDescLight.SENSOR_ID,
+			SensorDescMagnetic.SENSOR_ID, SensorDescNoise.SENSOR_ID, SensorDescPressure.SENSOR_ID, SensorDescProximity.SENSOR_ID,
+			SensorDescTemperature.SENSOR_ID, SensorDescNotification.SENSOR_ID, SensorDescTraffic.SENSOR_ID};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
