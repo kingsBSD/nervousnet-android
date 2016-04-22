@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.TrafficStats;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
+//import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +100,7 @@ public class TrafficSensor {
     }
 
     public void start() {
-        Log.d("traffic", "Traffic sensor started");
+        //Log.d("traffic", "Traffic sensor started");
         new TrafficTask().execute();
     }
 
@@ -108,7 +108,7 @@ public class TrafficSensor {
 
         @Override
         protected Void doInBackground(Void... params) {
-            Log.d("traffic", "scanning...");
+            //Log.d("traffic", "scanning...");
             long bytes, txBytes, rxBytes, lastTx, lastRx = 0;
             for (Integer uid : uids) {
                 txBytes = 0;
@@ -126,7 +126,7 @@ public class TrafficSensor {
                     trafficRxByUid.put(uid, bytes);
                 }
                 if (txBytes > 0 || rxBytes > 0) {
-                    Log.d("traffic", "Sent data...");
+                    //Log.d("traffic", "Sent data...");
                     dataReady(System.currentTimeMillis(), namesByUid.get(uid), rxBytes, txBytes);
                 }
             }

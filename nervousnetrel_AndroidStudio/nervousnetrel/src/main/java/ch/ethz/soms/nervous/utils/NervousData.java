@@ -198,6 +198,7 @@ public class NervousData extends SQLiteOpenHelper {
 		values.put(NervousTables.TrafficTable.COLUMN_NAME_TRAFFIC_APP_NAME, traffic.getAppName());
 		values.put(NervousTables.TrafficTable.COLUMN_NAME_TRAFFIC_BYTES_IN, traffic.getbytesIn());
 		values.put(NervousTables.TrafficTable.COLUMN_NAME_TRAFFIC_BYTES_OUT, traffic.getbytesOut());
+		values.put(NervousTables.TrafficTable.COLUMN_NAME_TIMESTAMP, traffic.getTimestamp());
 		putRow(db, NervousTables.TrafficTable.TABLE_NAME, values);
 	}
 
