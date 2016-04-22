@@ -109,18 +109,20 @@ public class TrafficSensor {
         @Override
         protected Void doInBackground(Void... params) {
             Log.d("traffic", "scanning...");
-            long bytes, txBytes, rxBytes = 0;
+            long bytes, txBytes, rxBytes, lastTx, lastRx = 0;
             for (Integer uid : uids) {
                 txBytes = 0;
                 rxBytes = 0;
-                bytes = TrafficStats.getUidTxBytes(uid) - trafficTxByUid.get(uid);
+                bytes = TrafficStats.getUidTxBytes(uid);
+                lastTx =  trafficTxByUid.get(uid);
+                lastRx =  trafficRxByUid.get(uid);
                 if (bytes > trafficTxByUid.get(uid)) {
-                    txBytes = bytes;
+                    txBytes = bytes - lastTx;
                     trafficTxByUid.put(uid, bytes);
                 }
                 bytes = TrafficStats.getUidRxBytes(uid) - trafficTxByUid.get(uid);
                 if (bytes > trafficRxByUid.get(uid)) {
-                    rxBytes = bytes;
+                    rxBytes = bytes - lastRx;
                     trafficRxByUid.put(uid, bytes);
                 }
                 if (txBytes > 0 || rxBytes > 0) {
