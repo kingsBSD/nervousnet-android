@@ -47,8 +47,15 @@
 
 <p>Our previous project <a href="https://big-social-data.net/">Our Data Ourselves</a> involved the creation of our <a href="http://kingsbsd.github.io/MobileMiner/">MobileMiner</a> app, which was able to gather significant information about the activity of other apps. We have implemented three of the methods used as sensors with our version of NervousNet.</p>
 
-<p>1 ##Notifications
-By prompting the user to enable the app as an "<a href="https://github.com/kingsBSD/nervousnet-android/blob/alt-master-kingsbsd/nervousnetrel_AndroidStudio/nervousnetrel/src/main/java/ch/ethz/soms/nervous/android/NotificationService.java">accessibility service</a>" it is possible to log when internet-enabled apps send notifications to the user.</p>
+<p>1 Notifications
+By prompting the user to enable the app as an "<a href="https://github.com/kingsBSD/nervousnet-android/blob/alt-master-kingsbsd/nervousnetrel_AndroidStudio/nervousnetrel/src/main/java/ch/ethz/soms/nervous/android/NotificationService.java">accessibility service</a>" it is possible to log when internet-enabled apps send notifications to the user.
+We have <a href="http://www.slideshare.net/kingsBSD/net-sci2015">shown</a> that the number of notifications that Twitter sends a user is a reasonable indication of the numer of account they follow.</p>
+
+<p>2 Sockets
+Is is (sometimes) possible to determine which apps have opened network sockets by <a href="https://github.com/kingsBSD/nervousnet-android/blob/alt-master-kingsbsd/nervousnetrel_AndroidStudio/nervousnetrel/src/main/java/ch/ethz/soms/nervous/android/sensors/SocketSensor.java">polling</a> the /proc/net/ directory for the PID of each app installed on the device. This method yields the protocol and port of the socket, it is interesting to see which apps use SSL on port 443. The various group permissions of the underlying Linux system means that this is not always possible, but browsers, media players and some games work well. MobileMiner acquires this data at a far higher frequency than is perhaps appropriate for NervousNet. </p>
+
+<p>3 Network Traffic
+When socket usage can't be determined for an app, the Android traffic statistics API <em>might</em> work. -The documentation doesn't explain why this information is sometimes withheld for some apps. Again, by <a href="https://github.com/kingsBSD/nervousnet-android/blob/alt-master-kingsbsd/nervousnetrel_AndroidStudio/nervousnetrel/src/main/java/ch/ethz/soms/nervous/android/sensors/SensorDescTraffic.java">polling</a> this API, we can track the network behavious of many apps.</p>
       </section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
