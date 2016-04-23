@@ -1,6 +1,6 @@
 {
   "name": "Nervousnet-android",
   "tagline": "Extra sensors to track app activity.",
-  "body": "### NervousNet -[@KingsBSD](https://twitter.com/kingsBSD) [Hackathon](http://www.nervousnet.ethz.ch/hackathon/) Edition\r\n\r\n[NervousNet](http://www.nervousnet.ethz.ch/) is a reaction to the current state of affairs where users have little control over the data their mobile devices create. \r\n\r\n",
+  "body": "### NervousNet -[@KingsBSD](https://twitter.com/kingsBSD) [Hackathon](http://www.nervousnet.ethz.ch/hackathon/) Edition\r\n\r\n[NervousNet](http://www.nervousnet.ethz.ch/) is a reaction to the current state of affairs where users have little control over the data their mobile devices create.\r\n\r\nAs it stands, the app gives users the means to collect and share a wide variety of sensor data. However, what can be done to help them gain understanding of the data their existing apps create?\r\n\r\n\r\nIs a true \"digital democracy\" even possible with current mobile platforms?\r\n\r\n[SQLite Export](https://raw.githubusercontent.com/kingsBSD/nervousnet-android/gh-pages/images/nervous_export.png)\r\n\r\n",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
